@@ -77,7 +77,7 @@ async def check_subs(callback: CallbackQuery):
             exist_user = await user_service.get_by_id(user_id)
             if not exist_user:
                 now = datetime.now(timezone.utc)
-                new_expiry = now + timedelta(days=30)
+                new_expiry = now + timedelta(days=365)
                 new_user = User(
                     id=user_id,
                     first_name=callback.from_user.first_name,

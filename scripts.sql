@@ -1,4 +1,4 @@
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     id BIGINT NOT NULL PRIMARY KEY,
     first_name TEXT,
@@ -9,48 +9,48 @@ CREATE TABLE users
     total_score  INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE TABLE subjects
+CREATE TABLE IF NOT EXISTS subjects
 (
     id SERIAL NOT NULL PRIMARY KEY,
     name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE classes
+CREATE TABLE IF NOT EXISTS classes
 (
     id SERIAL NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     subject_id INTEGER NOT NULL REFERENCES subjects(id) ON DELETE CASCADE
 );
 
-CREATE TABLE topics
+CREATE TABLE IF NOT EXISTS topics
 (
     id SERIAL NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     class_id INTEGER NOT NULL REFERENCES classes(id) ON DELETE CASCADE
 );
 
-CREATE TABLE video_lessons
+CREATE TABLE IF NOT EXISTS video_lessons
 (
     id SERIAL NOT NULL PRIMARY KEY,
     file_id TEXT NOT NULL,
     topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE
 );
 
-CREATE TABLE audio_lessons
+CREATE TABLE IF NOT EXISTS audio_lessons
 (
     id SERIAL NOT NULL PRIMARY KEY,
     file_id TEXT NOT NULL,
     topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE
 );
 
-CREATE TABLE pdf_materials
+CREATE TABLE IF NOT EXISTS pdf_materials
 (
     id SERIAL NOT NULL PRIMARY KEY,
     file_id TEXT NOT NULL,
     topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE
 );
 
-CREATE TABLE tests
+CREATE TABLE IF NOT EXISTS tests
 (
     id SERIAL NOT NULL PRIMARY KEY,
     question TEXT NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE tests
     topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE
 );
 
-CREATE TABLE test_options
+CREATE TABLE IF NOT EXISTS test_options
 (
     id SERIAL NOT NULL PRIMARY KEY,
     option TEXT NOT NULL,
@@ -66,14 +66,14 @@ CREATE TABLE test_options
     test_id INTEGER NOT NULL REFERENCES tests(id) ON DELETE CASCADE
 );
 
-CREATE TABLE fill_blanks_tests
+CREATE TABLE IF NOT EXISTS fill_blanks_tests
 (
     id SERIAL NOT NULL PRIMARY KEY,
     text TEXT NOT NULL,
     topic_id INTEGER NOT NULL REFERENCES topics(id) ON DELETE CASCADE
 );
 
-CREATE TABLE fill_blanks_test_answers
+CREATE TABLE IF NOT EXISTS fill_blanks_test_answers
 (
     id SERIAL NOT NULL PRIMARY KEY,
     fill_blanks_test_id INTEGER NOT NULL REFERENCES fill_blanks_tests(id) ON DELETE CASCADE,
@@ -81,7 +81,7 @@ CREATE TABLE fill_blanks_test_answers
     answer TEXT NOT NULL
 );
 
-CREATE TABLE user_answers_test_containers
+CREATE TABLE IF NOT EXISTS user_answers_test_containers
 (
     id SERIAL NOT NULL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id),
@@ -89,16 +89,16 @@ CREATE TABLE user_answers_test_containers
     got_score BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE user_answers_test
+CREATE TABLE IF NOT EXISTS user_answers_test
 (
     id SERIAL NOT NULL PRIMARY KEY,
     user_answers_test_container_id INTEGER NOT NULL REFERENCES user_answers_test_containers(id),
     test_id INTEGER NOT NULL REFERENCES tests(id),
     selected_option_id INTEGER NOT NULL REFERENCES test_options(id),
-    was_correct BOOLEAN NOT NULL,
+    was_correct BOOLEAN NOT NULL
 );
 
-CREATE TABLE user_answers_fill_blanks_test_containers
+CREATE TABLE IF NOT EXISTS user_answers_fill_blanks_test_containers
 (
     id SERIAL NOT NULL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id),
@@ -106,7 +106,7 @@ CREATE TABLE user_answers_fill_blanks_test_containers
     got_score BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE user_answers_fill_blanks_test
+CREATE TABLE IF NOT EXISTS user_answers_fill_blanks_test
 (
     id SERIAL NOT NULL PRIMARY KEY,
     user_answers_fill_blanks_test_container_id INTEGER NOT NULL REFERENCES user_answers_fill_blanks_test_containers(id),
@@ -116,7 +116,7 @@ CREATE TABLE user_answers_fill_blanks_test
     was_correct BOOLEAN NOT NULL
 );
 
-CREATE TABLE fights
+CREATE TABLE IF NOT EXISTS fights
 (
     id SERIAL NOT NULL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id), -- creator
@@ -126,28 +126,28 @@ CREATE TABLE fights
 -- ALTER TABLE fights ADD COLUMN topic_ids INTEGER[] NOT NULL;
 
 
-CREATE TABLE fight_tests
+CREATE TABLE IF NOT EXISTS fight_tests
 (
     id SERIAL NOT NULL PRIMARY KEY,
     fight_id INTEGER NOT NULL REFERENCES fights(id),
     test_id INTEGER NOT NULL REFERENCES tests(id)
 );
 
-CREATE TABLE fight_fill_blanks
+CREATE TABLE IF NOT EXISTS fight_fill_blanks
 (
     id SERIAL NOT NULL PRIMARY KEY,
     fight_id INTEGER NOT NULL REFERENCES fights(id),
     fill_blanks_test_id INTEGER NOT NULL REFERENCES fill_blanks_tests(id)
 );
 
-CREATE TABLE participants 
+CREATE TABLE IF NOT EXISTS participants 
 (
     id SERIAL NOT NULL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id),
     fight_id INTEGER NOT NULL REFERENCES fights(id)
 );
 
-CREATE TABLE user_context
+CREATE TABLE IF NOT EXISTS user_context
 (
     id SERIAL NOT NULL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id),
@@ -156,22 +156,21 @@ CREATE TABLE user_context
     selected_topic_id INTEGER REFERENCES topics(id)
 );
 
-CREATE TABLE channels
+CREATE TABLE IF NOT EXISTS channels
 (
     id SERIAL NOT NULL PRIMARY KEY,
     username TEXT NOT NULL,
     link TEXT NOT NULL
 );
 
-CREATE TABLE got_scores(
+CREATE TABLE IF NOT EXISTS got_scores(
     id SERIAL NOT NULL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id),
     topic_id INTEGER NOT NULL REFERENCES topics(id),
     test_type TEXT NOT NULL -- 'test' or 'fillblanks'
-)
+);
 
-
-CREATE TABLE user_daily_limits (
+CREATE TABLE IF NOT EXISTS user_daily_limits(
     id SERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id),
     action_type TEXT NOT NULL, -- 'test', 'fillblanks', 'fight'
@@ -179,19 +178,19 @@ CREATE TABLE user_daily_limits (
     UNIQUE(user_id, action_type, date)
 );
 
-CREATE TABLE fight_test_container(
+CREATE TABLE IF NOT EXISTS fight_test_container(
     id SERIAL NOT NULL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     fight_id INTEGER NOT NULL,
     test_container_id INTEGER NOT NULL
 );
 
-CREATE TABLE fight_fill_blanks_container(
+CREATE TABLE IF NOT EXISTS fight_fill_blanks_container(
     id SERIAL NOT NULL PRIMARY KEY,
     user_id BIGINT NOT NULL,
     fight_id INTEGER NOT NULL,
     fill_blanks_container_id INTEGER NOT NULL
-)
+);
 
 -- 1
 ALTER TABLE user_answers_fill_blanks_test

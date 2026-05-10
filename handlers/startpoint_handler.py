@@ -59,7 +59,7 @@ async def welcome(message: Message, state: FSMContext):
 
             maybe_user = await user_service.get_by_id(user_id)
             now = datetime.now(timezone.utc)
-            new_expiry = now + timedelta(days=30)
+            new_expiry = now + timedelta(days=365)
             if not maybe_user:
                 new_user = User(
                     id=user_id,
